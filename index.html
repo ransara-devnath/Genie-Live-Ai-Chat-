@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GenieBot – Your Coding Assistant</title>
+  <title>GenieBot – Your Personal Assistant</title>
   <style>
     body {
       margin: 0;
@@ -14,8 +14,47 @@
       overflow: hidden;
 }
 
-.chat-container {
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #0a0a23;
       display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      animation: fadeOut 2s ease 3s forwards;
+      z-index: 999;
+}
+
+.loading-bar {
+      height: 20px;
+      width: 80%;
+      margin-bottom: 20px;
+      transform-origin: left;
+      animation: expanding 0.4s 0.7s forwards linear, moving 1s 1s infinite linear;
+      border-radius: 10px;
+      background-image: linear-gradient(to right, #eff6ff 30%, #2563eb60 60%, #eff6ff);
+      background-size: 200% auto;
+      opacity: 0;
+}
+
+    @keyframes expanding {
+      0% { transform: scaleX(0); opacity: 0;}
+      100% { transform: scaleX(1); opacity: 1;}
+}
+
+    @keyframes moving {
+      0% { background-position: 0 0;}
+      100% { background-position: -200% 0;}
+}
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden;}
+}
+
+.chat-container {
+      display: none;
       flex-direction: column;
       height: 100vh;
       padding: 20px;
@@ -35,17 +74,24 @@
       overflow-y: auto;
       box-shadow: 0 0 10px #00f0ff33;
       scroll-behavior: smooth;
+      padding-bottom: 120px;
 }
 
 .input-area {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-top: 10px;
       background: #1a1a3d;
       border-radius: 12px;
       padding: 10px;
       box-shadow: 0 0 8px #00f0ff55;
+      z-index: 10;
 }
 
     input {
@@ -87,6 +133,23 @@
       align-self: flex-start;
 }
 
+.typing {
+      font-style: italic;
+      opacity: 0.7;
+      animation: blink 1s infinite;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: #002244;
+      max-width: 80%;
+      align-self: flex-start;
+}
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.5;}
+      50% { opacity: 1;}
+}
+
     pre {
       background: #111;
       padding: 10px;
@@ -108,7 +171,7 @@
       input, button {
         font-size: 14px;
         padding: 10px;
-}
+       }
 
       h1 {
         font-size: 22px;
@@ -121,10 +184,15 @@
   </style>
 </head>
 <body>
+  <div id="loader">
+    <div class="loading-bar"></div>
+    <h2>Loading GenieBot...</h2>
+  </div>
+
   <div class="chat-container">
     <header>
       <h1>🤖 GenieBot</h1>
-      <p>Your personal coding assistant</p>
+      <p>Your personal assistant & coding companion</p>
     </header>
 
     <div class="chat-box" id="chat-box"></div>
@@ -136,6 +204,13 @@
   </div>
 
   <script>
+    window.onload = () => {
+      setTimeout(() => {
+        document.getElementById("loader").style.display = "none";
+        document.querySelector(".chat-container").style.display = "flex";
+}, 3500);
+};
+
     const topics = {
       "python": {
         desc: "🐍 Python is a beginner-friendly language used in web, AI, and automation.",
@@ -164,79 +239,26 @@
 }
 };
 
-    const personalReplies = {
-      "hi": "Hey there! I'm GenieBot, your coding buddy. 😊",
-      "how are you": "I'm always online and ready to help! ⚡",
-      "who are you": "I'm GenieBot — your personal assistant for learning code and chatting!",
-      "what can you do": "I can explain programming languages, show examples, and chat with you like a friend.",
-      "thank you": "You're most welcome! 💙",
-      "love you": "Aww, I love helping you too! 💻💖"
-};
-
-    function detectIntent(message) {
-      const lower = message.toLowerCase();
-      if (lower.includes("vs") || lower.includes("difference")) return "compare";
-      if (lower.includes("teach") || lower.includes("learn")) return "teach";
-      if (lower.includes("example") || lower.includes("code")) return "code";
-      return "describe";
-}
-
-    function extractTopic(message) {
-      const found = [];
-      for (let key in topics) {
-        if (message.toLowerCase().includes(key)) {
-          found.push(key);
-}
-}
-      return found;
-}
-
-    function sendMessage() {
-      const input = document.getElementById("user-input");
-      const message = input.value.trim();
-      const lower = message.toLowerCase();
-      if (!message) return;
-
-      appendMessage("You", message);
-      input.value = "";
-
-      // Personal assistant replies
-      for (let key in personalReplies) {
-        if (lower.includes(key)) {
-          return setTimeout(() => {
-            appendMessage("GenieBot", personalReplies[key]);
-}, 500);
-}
-}
-
-      const intent = detectIntent(message);
-      const matched = extractTopic(message);
-
-      let response = "🤖 I can help you learn programming! Try asking about Python, JavaScript, or HTML.";
-
-      if (matched.length === 1) {
-        const topic = topics[matched[0]];
-        if (intent === "describe") response = topic.desc;
-        else if (intent === "teach") response = topic.desc + "<br><br><strong>Let's start with an example:</strong><br><pre><code>" + topic.code + "</code></pre>";
-        else if (intent === "code") response = "<strong>Example:</strong><br><pre><code>" + topic.code + "</code></pre>";
-} else if (matched.length === 2 && intent === "compare") {
-        response = `<strong>${matched[0].toUpperCase()} vs ${matched[1].toUpperCase()}:</strong><br>` +
-          topics[matched[0]].compare + "<br><br>" + topics[matched[1]].compare;
-}
-
-      setTimeout(() => {
-        appendMessage("GenieBot", response);
-}, 600);
-}
-
-    function appendMessage(sender, text) {
-      const chatBox = document.getElementById("chat-box");
-      const msg = document.createElement("div");
-      msg.className = sender === "You"? "user-message": "bot-message";
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-}
-  </script>
-</body>
-</html>
+    const assistantReplies = {
+      "your name": "I'm GenieBot, your personal assistant and coding buddy! 🤖",
+      "who created you": "I was created by Ransara Devnath — a creative developer! 💻",
+      "what can you do": "I can help you learn code, answer questions, tell jokes, and chat like a friend.",
+      "time": () => {
+        const now = new Date();
+        return `🕒 It's currently ${now.toLocaleTimeString()}`;
+},
+      "date": () => {
+        const today = new Date();
+        return `📅 Today is ${today.toDateString()}`;
+},
+      "joke": [
+        "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
+        "Why did the JavaScript developer go broke? Because he kept using 'var' instead of 'let'! 😄"
+      ],
+      "motivate": [
+        "Keep going — you're doing amazing! 💪",
+        "Every bug you fix makes you stronger. Debug like a hero! 🛠️",
+        "Learning to code is like learning magic. You're a wizard in progress! ✨"
+      ],
+      "weather": "I'm not connected to real-time weather, but I hope it's sunny in your heart today! ☀️",
+      "default": "⁽¹⁾
