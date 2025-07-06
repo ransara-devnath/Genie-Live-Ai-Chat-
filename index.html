@@ -170,11 +170,11 @@
 
       input, button {
         font-size: 14px;
-        padding: 10px;
+       padding: 10px;
 }
 
       h1 {
-     font-size: 22px;
+        font-size: 22px;
 }
 
       header p {
@@ -195,7 +195,9 @@
       <p>Your personal assistant & coding companion</p>
     </header>
 
-    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-box" id="chat-box">
+      <div class="bot-message"><strong>GenieBot:</strong> Hello! I'm GenieBot. Ask me anything about coding or life! 😊</div>
+    </div>
 
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Ask me anything..." />
@@ -209,6 +211,24 @@
         document.getElementById("loader").style.display = "none";
         document.querySelector(".chat-container").style.display = "flex";
 }, 3500);
+};
+
+    const assistantReplies = {
+      "your name": "I'm GenieBot, your personal assistant and coding buddy! 🤖",
+      "who created you": "I was created by Ransara Devnath — a creative developer! 💻",
+      "what can you do": "I can help you learn code, answer questions, tell jokes, and chat like a friend.",
+      "time": () => new Date().toLocaleTimeString(),
+      "date": () => new Date().toDateString(),
+      "joke": [
+        "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
+        "Why did the JavaScript developer go broke? Because he kept using 'var' instead of 'let'! 😄"
+      ],
+      "motivate": [
+        "Keep going — you're doing amazing! 💪",
+        "Every bug you fix makes you stronger. Debug like a hero! 🛠️",
+        "Learning to code is like learning magic. You're a wizard in progress! ✨"
+      ],
+      "weather": "I'm not connected to real-time weather, but I hope it's sunny in your heart today! ☀️"
 };
 
     const topics = {
@@ -239,26 +259,6 @@
 }
 };
 
-    const assistantReplies = {
-      "your name": "I'm GenieBot, your personal assistant and coding buddy! 🤖",
-      "who created you": "I was created by Ransara Devnath — a creative developer! 💻",
-      "what can you do": "I can help you learn code, answer questions, tell jokes, and chat like a friend.",
-      "time": () => new Date().toLocaleTimeString(),
-      "date": () => new Date().toDateString(),
-      "joke": [
-        "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
-        "Why did the JavaScript developer go broke? Because he kept using 'var' instead of 'let'! 😄"
-      ],
-      "motivate": [
-        "Keep going — you're doing amazing! 💪",
-        "Every bug you fix makes you stronger. Debug like a hero! 🛠️",
-        "Learning to code is like learning magic. You're a wizard in progress! ✨"
-      ],
-      "weather": "I'm not connected to real-time weather, but I hope it's sunny in your heart today! ☀️"
-};
-
     function detectIntent(message) {
-      const lower = message.toLowerCase();
-      if (lower.includes("vs") || lower.includes("difference")) return "compare";
-      if (lower.includes("teach") || lower.includes⁽¹⁾
+      const lower⁽¹⁾
 
