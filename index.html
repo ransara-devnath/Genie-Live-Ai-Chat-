@@ -3,53 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GenieChat</title>
+  <title>GenieCodeBot</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #2e003e, #001f4d);
+      background: linear-gradient(135deg, #1e003e, #001f4d);
       color: #fff;
       height: 100vh;
       overflow: hidden;
-}
-
-    #loader {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #0a0a23;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      animation: fadeOut 2s ease 3s forwards;
-}
-
-.loading-bar {
-      height: 20px;
-      width: 80%;
-      margin-bottom: 20px;
-      transform-origin: left;
-      animation: expanding 0.4s 0.7s forwards linear, moving 1s 1s infinite linear;
-      border-radius: 10px;
-      background-image: linear-gradient(to right, #eff6ff 30%, #2563eb60 60%, #eff6ff);
-      background-size: 200% auto;
-      opacity: 0;
-}
-
-    @keyframes expanding {
-      0% { transform: scaleX(0); opacity: 0;}
-      100% { transform: scaleX(1); opacity: 1;}
-}
-
-    @keyframes moving {
-      0% { background-position: 0 0;}
-      100% { background-position: -200% 0;}
-}
-
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden;}
 }
 
 .chat-container {
@@ -58,8 +20,6 @@
       height: 100vh;
       padding: 20px;
       box-sizing: border-box;
-      max-width: 100%;
-      display: none;
 }
 
     header {
@@ -101,11 +61,6 @@
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-}
-
-    button:hover {
-      background: #00bcd4;
 }
 
 .user-message,.bot-message {
@@ -113,7 +68,6 @@
       padding: 10px;
       border-radius: 10px;
       max-width: 80%;
-      animation: fadeIn 0.5s ease;
 }
 
 .user-message {
@@ -126,20 +80,12 @@
       align-self: flex-start;
 }
 
-.typing {
-      font-style: italic;
-      opacity: 0.7;
-      animation: blink 1s infinite;
-}
-
-    @keyframes blink {
-      0%, 100% { opacity: 0.7;}
-      50% { opacity: 1;}
-}
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px);}
-      to { opacity: 1; transform: translateY(0);}
+    pre {
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      color: #00f0ff;
 }
 
     @media screen and (max-width: 600px) {
@@ -168,61 +114,94 @@
   </style>
 </head>
 <body>
-  <div id="loader">
-    <div class="loading-bar"></div>
-    <h2>Loading GenieChat...</h2>
-  </div>
-
   <div class="chat-container">
     <header>
-      <h1>🧞 GenieChat</h1>
-      <p>by Ransara Devnath</p>
+      <h1>💻 GenieCodeBot</h1>
+      <p>Learn coding the smart way — powered by logic!</p>
     </header>
 
     <div class="chat-box" id="chat-box"></div>
 
     <div class="input-area">
-    <input type="text" id="user-input" placeholder="Ask me anything..." />
+      <input type="text" id="user-input" placeholder="Ask about Python, JavaScript, etc." />
       <button onclick="sendMessage()">➤</button>
     </div>
   </div>
 
   <script>
-    const GEMINI_API_KEY = "AIzaSyBsdPyJa_Z71CYmpzd6wwenb674feDTINw"; // Replace with your real Gemini API key
-
-    window.onload = () => {
-      setTimeout(() => {
-        document.getElementById("loader").style.display = "none";
-        document.querySelector(".chat-container").style.display = "flex";
-}, 3500);
+    const topics = {
+      "python": {
+        desc: "🐍 Python is a beginner-friendly language used in web, AI, and automation.",
+        code: `print("Hello, world!")`,
+        compare: "Python is easier to learn and more flexible than Java for beginners."
+},
+      "javascript": {
+        desc: "🟨 JavaScript makes websites interactive — buttons, animations, and logic.",
+        code: `console.log("Hello, world!");`,
+        compare: "JavaScript runs in browsers, while Python is used more for backend and data science."
+},
+      "java": {
+        desc: "☕ Java is a powerful language used in Android apps and enterprise software.",
+        code: `System.out.println("Hello, world!");`,
+        compare: "Java is more verbose and strict than Python, but great for large-scale systems."
+},
+      "html": {
+        desc: "📄 HTML structures web content using tags like <h1>, <p>, and <div>.",
+        code: `<h1>Hello, world!</h1>`,
+        compare: "HTML is not a programming language, but a markup language for structuring content."
+},
+      "css": {
+        desc: "🎨 CSS styles HTML — colors, layouts, fonts, and more.",
+        code: `h1 { color: blue; font-size: 24px;}`,
+       compare: "CSS works with HTML to design the visual layout of web pages."
+}
 };
 
-    async function sendMessage() {
+    function detectIntent(message) {
+      const lower = message.toLowerCase();
+      if (lower.includes("vs") || lower.includes("difference")) return "compare";
+      if (lower.includes("teach") || lower.includes("learn")) return "teach";
+      if (lower.includes("example") || lower.includes("code")) return "code";
+      return "describe";
+}
+
+    function extractTopic(message) {
+      const found = [];
+      for (let key in topics) {
+        if (message.toLowerCase().includes(key)) {
+          found.push(key);
+}
+}
+      return found;
+}
+
+    function sendMessage() {
       const input = document.getElementById("user-input");
       const message = input.value.trim();
+      const lower = message.toLowerCase();
       if (!message) return;
 
       appendMessage("You", message);
       input.value = "";
 
-      appendTyping();
+      const intent = detectIntent(message);
+      const matched = extractTopic(message);
 
-      const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + GEMINI_API_KEY,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json"},
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: message}]}]
-})
+      let response = "🤖 I can help you learn programming! Try asking about Python, JavaScript, or HTML.";
+
+      if (matched.length === 1) {
+        const topic = topics[matched[0]];
+        if (intent === "describe") response = topic.desc;
+        else if (intent === "teach") response = topic.desc + "<br><br><strong>Let's start with an example:</strong><br><pre><code>" + topic.code + "</code></pre>";
+        else if (intent === "code") response = "<strong>Example:</strong><br><pre><code>" + topic.code + "</code></pre>";
+} else if (matched.length === 2 && intent === "compare") {
+        response = `<strong>${matched[0].toUpperCase()} vs ${matched[1].toUpperCase()}:</strong><br>` +
+          topics[matched[0]].compare + "<br><br>" + topics[matched[1]].compare;
 }
-);
 
-      const data = await response.json();
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't understand that.";
-
-      removeTyping();
-      appendMessage("GenieChat", reply);
+      setTimeout(() => {
+        appendMessage("GenieCodeBot", response);
+}, 600);
 }
 
     function appendMessage(sender, text) {
@@ -231,26 +210,6 @@
       msg.className = sender === "You"? "user-message": "bot-message";
       msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
       chatBox.appendChild(msg);
-      scrollToBottom();
-}
-
-    function appendTyping() {
-      const chatBox = document.getElementById("chat-box");
-      const typing = document.createElement("div");
-      typing.className = "bot-message typing";
-      typing.id = "typing";
-      typing.innerText = "GenieChat is typing...";
-      chatBox.appendChild(typing);
-      scrollToBottom();
-}
-
-    function removeTyping() {
-      const typing = document.getElementById("typing");
-      if (typing) typing.remove();
-}
-
-    function scrollToBottom() {
-      const chatBox = document.getElementById("chat-box");
       chatBox.scrollTop = chatBox.scrollHeight;
 }
   </script>
