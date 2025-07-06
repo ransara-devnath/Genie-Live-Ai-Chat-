@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GenieCodeBot</title>
+  <title>GenieBot – Your Coding Assistant</title>
   <style>
     body {
       margin: 0;
@@ -39,27 +39,34 @@
 
 .input-area {
       display: flex;
+      align-items: center;
       gap: 10px;
       margin-top: 10px;
+      background: #1a1a3d;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 0 8px #00f0ff55;
 }
 
     input {
       flex: 1;
       padding: 12px;
       font-size: 16px;
-      border-radius: 10px;
-      background: #1a1a3d;
-      color: white;
       border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: white;
+      outline: none;
 }
 
     button {
-      padding: 12px 16px;
+      padding: 10px 16px;
       font-size: 16px;
       border-radius: 10px;
       background: #00f0ff;
       color: #000;
       font-weight: bold;
+      border: none;
       cursor: pointer;
 }
 
@@ -116,14 +123,14 @@
 <body>
   <div class="chat-container">
     <header>
-      <h1>💻 GenieCodeBot</h1>
-      <p>Learn coding the smart way — powered by logic!</p>
+      <h1>🤖 GenieBot</h1>
+      <p>Your personal coding assistant</p>
     </header>
 
     <div class="chat-box" id="chat-box"></div>
 
     <div class="input-area">
-      <input type="text" id="user-input" placeholder="Ask about Python, JavaScript, etc." />
+      <input type="text" id="user-input" placeholder="Ask me anything..." />
       <button onclick="sendMessage()">➤</button>
     </div>
   </div>
@@ -153,8 +160,17 @@
       "css": {
         desc: "🎨 CSS styles HTML — colors, layouts, fonts, and more.",
         code: `h1 { color: blue; font-size: 24px;}`,
-       compare: "CSS works with HTML to design the visual layout of web pages."
+        compare: "CSS works with HTML to design the visual layout of web pages."
 }
+};
+
+    const personalReplies = {
+      "hi": "Hey there! I'm GenieBot, your coding buddy. 😊",
+      "how are you": "I'm always online and ready to help! ⚡",
+      "who are you": "I'm GenieBot — your personal assistant for learning code and chatting!",
+      "what can you do": "I can explain programming languages, show examples, and chat with you like a friend.",
+      "thank you": "You're most welcome! 💙",
+      "love you": "Aww, I love helping you too! 💻💖"
 };
 
     function detectIntent(message) {
@@ -184,6 +200,15 @@
       appendMessage("You", message);
       input.value = "";
 
+      // Personal assistant replies
+      for (let key in personalReplies) {
+        if (lower.includes(key)) {
+          return setTimeout(() => {
+            appendMessage("GenieBot", personalReplies[key]);
+}, 500);
+}
+}
+
       const intent = detectIntent(message);
       const matched = extractTopic(message);
 
@@ -200,7 +225,7 @@
 }
 
       setTimeout(() => {
-        appendMessage("GenieCodeBot", response);
+        appendMessage("GenieBot", response);
 }, 600);
 }
 
